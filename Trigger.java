@@ -1,6 +1,5 @@
 package com.booksaw.betterGuis.api;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +11,7 @@ import org.bukkit.event.inventory.ClickType;
 import com.booksaw.betterGuis.gui.BetterGui;
 import com.booksaw.betterGuis.internalApi.TypeList;
 import com.booksaw.betterGuis.item.BetterItem;
+import com.booksaw.betterGuis.item.trigger.CommandTrigger;
 import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
 
 import net.md_5.bungee.api.ChatColor;
@@ -41,8 +41,8 @@ public abstract class Trigger {
 	/**
 	 * Adding all internal triggers
 	 */
-	static {
-		// TODO
+	public static void enable() {
+		registerTrigger("cmd", CommandTrigger.class);
 	}
 
 	private final static TypeList<Trigger> triggers = new TypeList<>();
@@ -83,8 +83,7 @@ public abstract class Trigger {
 
 		try {
 			t = triggers.createInstance(reference);
-		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException | NullPointerException e) {
+		} catch (Exception e) {
 			// debug output
 			Bukkit.getLogger().warning("[BetterGuis] Something went wrong when loading the trigger " + reference
 					+ ", the error message is below");
@@ -103,6 +102,22 @@ public abstract class Trigger {
 	 */
 	public static Set<String> getTriggerKeys() {
 		return triggers.getKeyList();
+	}
+
+	/**
+	 * Used to get a trigger from the saved details about it
+	 * 
+	 * @param section The configuration section to create the trigger from
+	 * @return The created trigger
+	 */
+	public static Trigger getTrigger(ConfigurationSection section) {
+		Trigger t = getTriggerInstance(section.getString("type"));
+
+		if (t == null) {
+			return null;
+		}
+		t.load(section);
+		return t;
 	}
 
 	/**
@@ -226,21 +241,24 @@ public abstract class Trigger {
 	 *         /bgui item details
 	 */
 	protected abstract String getPlaintext();
-	
+
 	/**
 	 * Used to get the help message for how the trigger details should be formatted
+	 * 
 	 * @return
 	 */
 	public abstract String getHelp();
 
 	/**
 	 * Used to load a new trigger with no details (from a command)
+	 * 
 	 * @return If the trigger can accept no deatils as an option
 	 */
 	public abstract boolean loadFromString();
-	
+
 	/**
-	 * Used to load details about the trigger from a string (from a command) 
+	 * Used to load details about the trigger from a string (from a command)
+	 * 
 	 * @param args The details provded
 	 * @return If the details provided are valid
 	 */
