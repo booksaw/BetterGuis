@@ -3,6 +3,7 @@ package com.booksaw.betterGuis.api;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -93,6 +94,15 @@ public abstract class Trigger {
 
 		return t;
 
+	}
+
+	/**
+	 * Used to get a set of all possible trigger references
+	 * 
+	 * @return The set of keys for all the triggers
+	 */
+	public static Set<String> getTriggerKeys() {
+		return triggers.getKeyList();
 	}
 
 	/**
@@ -216,5 +226,23 @@ public abstract class Trigger {
 	 *         /bgui item details
 	 */
 	protected abstract String getPlaintext();
+	
+	/**
+	 * Used to get the help message for how the trigger details should be formatted
+	 * @return
+	 */
+	public abstract String getHelp();
 
+	/**
+	 * Used to load a new trigger with no details (from a command)
+	 * @return If the trigger can accept no deatils as an option
+	 */
+	public abstract boolean loadFromString();
+	
+	/**
+	 * Used to load details about the trigger from a string (from a command) 
+	 * @param args The details provded
+	 * @return If the details provided are valid
+	 */
+	public abstract boolean loadFromString(String args);
 }
