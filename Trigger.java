@@ -1,11 +1,15 @@
 package com.booksaw.betterGuis.api;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.ClickType;
 
 import com.booksaw.betterGuis.gui.BetterGui;
+import com.booksaw.betterGuis.internalApi.TypeList;
 import com.booksaw.betterGuis.item.BetterItem;
 import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
 
@@ -32,19 +36,69 @@ import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
 public abstract class Trigger {
 
 	/**
-	 * Used to
+	 * Adding all internal triggers
+	 */
+	static {
+		// TODO
+	}
+
+	private final static TypeList<Trigger> triggers = new TypeList<>();
+
+	/**
+	 * Used to register a trigger so it can be used and loaded from
+	 * 
+	 * @param reference    The reference for the trigger
+	 * @param triggerClass The class which the trigger details are stored in
+	 */
+	public final static void registerTrigger(String reference, Class<? extends Trigger> triggerClass) {
+		triggers.add(reference, triggerClass);
+	}
+
+	/**
+	 * Used to remove a trigger from the list of available triggers
+	 * 
+	 * @param reference The reference for the trigger to be removed
+	 */
+	public final static void unregisterTrigger(String reference) {
+		triggers.remove(reference);
+	}
+
+	/**
+	 * Used to get an instance of a trigger subclass, any errors caused by returning
+	 * null should be handled by wherever runs this method
+	 * 
+	 * @param reference The reference for the trigger to create
+	 * @return The created trigger or null if it could not be created
+	 */
+	public final static Trigger getTriggerInstance(String reference) {
+
+		if (!triggers.containsKey(reference)) {
+			return null;
+		}
+
+		Trigger t;
+
+		try {
+			t = triggers.createInstance(reference);
+		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException | NullPointerException e) {
+			// debug output
+			Bukkit.getLogger().warning("[BetterGuis] Something went wrong when loading the trigger " + reference
+					+ ", the error message is below");
+			e.printStackTrace();
+			return null;
+		}
+
+		return t;
+
+	}
+
+	/**
+	 * Used to store all the click types of the list
 	 */
 	private List<ClickType> type = new ArrayList<>();;
 
-	/**
-	 * Used to execute the action, called whenver a trigger is activated
-	 * 
-	 * @param gui The gui which the item was placed in
-	 * @param e   The event called which triggered this execution
-	 */
-	public abstract void execute(BetterGui gui, GuiEvent e);
-
-	public List<ClickType> getType() {
+	public final List<ClickType> getType() {
 		return type;
 	}
 
@@ -55,7 +109,7 @@ public abstract class Trigger {
 	 *             details)
 	 * @param type The list of click types to add
 	 */
-	public void setType(BetterItem item, List<ClickType> type) {
+	public final void setType(BetterItem item, List<ClickType> type) {
 		this.type = type;
 		item.changes();
 	}
@@ -67,7 +121,7 @@ public abstract class Trigger {
 	 *             details)
 	 * @param type The click type to add
 	 */
-	public void addType(BetterItem item, ClickType type) {
+	public final void addType(BetterItem item, ClickType type) {
 		this.type.add(type);
 		item.changes();
 	}
@@ -78,18 +132,76 @@ public abstract class Trigger {
 	 * @param item
 	 * @param type
 	 */
-	public void removeType(BetterItem item, ClickType type) {
+	public final void removeType(BetterItem item, ClickType type) {
 		this.type.remove(type);
 		item.changes();
 	}
 
 	/**
-	 * Used to check if the click type should activate this object 
+	 * Used to check if the click type should activate this object
+	 * 
 	 * @param type The click type to check
 	 * @return If the trigger has been activated
 	 */
-	public boolean isType(ClickType type) {
+	public final boolean isType(ClickType type) {
 		return this.type.contains(type);
 	}
+
+	/**
+	 * Used to save the details for this trigger to file
+	 * 
+	 * @param config The config section to save the details to
+	 */
+	public final void save(ConfigurationSection config) {
+		config.set("type", getReference());
+
+		// saving the click type information
+		List<String> types = new ArrayList<>();
+		for (ClickType type : type) {
+			types.add(type.toString());
+		}
+
+		config.set("clickType", types);
+
+		saveDetails(config);
+	}
+
+	public final void load(ConfigurationSection config) {
+		// saving the click type information
+		List<String> types = config.getStringList("clickType");
+		for (String type : types) {
+			this.type.add(ClickType.valueOf(type));
+		}
+
+		loadDetails(config);
+	}
+
+	/**
+	 * Used to execute the action, called whenver a trigger is activated
+	 * 
+	 * @param gui The gui which the item was placed in
+	 * @param e   The event called which triggered this execution
+	 */
+	public abstract void execute(BetterGui gui, GuiEvent e);
+
+	/**
+	 * @return the reference for this trigger, this reference should never change as
+	 *         it is used for saving
+	 */
+	public abstract String getReference();
+
+	/**
+	 * Used to save the specific subclass details for this trigger
+	 * 
+	 * @param section The config section to save the details to
+	 */
+	protected abstract void saveDetails(ConfigurationSection section);
+
+	/**
+	 * Used to load the specfic subclass details for this trigger
+	 * 
+	 * @param section The config section which stores all the details
+	 */
+	protected abstract void loadDetails(ConfigurationSection section);
 
 }
