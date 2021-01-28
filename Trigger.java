@@ -13,6 +13,8 @@ import com.booksaw.betterGuis.internalApi.TypeList;
 import com.booksaw.betterGuis.item.BetterItem;
 import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
 
+import net.md_5.bungee.api.ChatColor;
+
 /**
  * A trigger is an action which is run when a user does a specific type of click
  * in the inventory A trigger can have multiple activations
@@ -176,8 +178,13 @@ public abstract class Trigger {
 		loadDetails(config);
 	}
 
+	@Override
+	public String toString() {
+		return ChatColor.AQUA + getReference() + ChatColor.WHITE + " - " + ChatColor.GOLD + getPlaintext();
+	}
+
 	/**
-	 * Used to execute the action, called whenver a trigger is activated
+	 * Used to execute the action, called whenever a trigger is activated
 	 * 
 	 * @param gui The gui which the item was placed in
 	 * @param e   The event called which triggered this execution
@@ -198,10 +205,16 @@ public abstract class Trigger {
 	protected abstract void saveDetails(ConfigurationSection section);
 
 	/**
-	 * Used to load the specfic subclass details for this trigger
+	 * Used to load the specific subclass details for this trigger
 	 * 
 	 * @param section The config section which stores all the details
 	 */
 	protected abstract void loadDetails(ConfigurationSection section);
+
+	/**
+	 * @return A plaintext description of this specific trigger, this is used in
+	 *         /bgui item details
+	 */
+	protected abstract String getPlaintext();
 
 }
