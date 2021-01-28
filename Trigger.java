@@ -11,7 +11,10 @@ import org.bukkit.event.inventory.ClickType;
 import com.booksaw.betterGuis.gui.BetterGui;
 import com.booksaw.betterGuis.internalApi.TypeList;
 import com.booksaw.betterGuis.item.BetterItem;
+import com.booksaw.betterGuis.item.trigger.CloseTrigger;
 import com.booksaw.betterGuis.item.trigger.CommandTrigger;
+import com.booksaw.betterGuis.item.trigger.GuiTrigger;
+import com.booksaw.betterGuis.item.trigger.UpdateTrigger;
 import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
 
 import net.md_5.bungee.api.ChatColor;
@@ -43,6 +46,9 @@ public abstract class Trigger {
 	 */
 	public static void enable() {
 		registerTrigger("cmd", CommandTrigger.class);
+		registerTrigger("close", CloseTrigger.class);
+		registerTrigger("update", UpdateTrigger.class);
+		registerTrigger("gui", GuiTrigger.class);
 	}
 
 	private final static TypeList<Trigger> triggers = new TypeList<>();
