@@ -56,7 +56,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
+This readme is a template and will be filled in closer to the plugin release
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
 Here's a blank template to get started:
