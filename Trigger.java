@@ -256,6 +256,11 @@ public abstract class Trigger {
 	public abstract String getHelp();
 
 	/**
+	 * @return The parameters required for this trigger
+	 */
+	public abstract String getParameters();
+
+	/**
 	 * Used to load a new trigger with no details (from a command)
 	 * 
 	 * @return If the trigger can accept no deatils as an option
@@ -269,4 +274,5 @@ public abstract class Trigger {
 	 * @return If the details provided are valid
 	 */
 	public abstract boolean loadFromString(String args);
+
 }
