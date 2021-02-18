@@ -131,7 +131,7 @@ public abstract class Trigger {
 	 */
 	private List<ClickType> type = new ArrayList<>();;
 
-	public final List<ClickType> getType() {
+	public final List<ClickType> getClickTypes() {
 		return type;
 	}
 
@@ -148,7 +148,7 @@ public abstract class Trigger {
 	}
 
 	/**
-	 * Used to add a single click type to the already eixsting list
+	 * Used to add a single click type to the already existing list
 	 * 
 	 * @param item The item this trigger is associated with (for saving the changed
 	 *             details)
