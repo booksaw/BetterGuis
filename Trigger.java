@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.ClickType;
 
@@ -117,6 +118,10 @@ public abstract class Trigger {
 	 * @return The created trigger
 	 */
 	public static Trigger getTrigger(ConfigurationSection section) {
+		if (section == null) {
+			throw new IllegalArgumentException("Provided configuration section is null");
+		}
+
 		Trigger t = getTriggerInstance(section.getString("type"));
 
 		if (t == null) {
@@ -274,5 +279,10 @@ public abstract class Trigger {
 	 * @return If the details provided are valid
 	 */
 	public abstract boolean loadFromString(String args);
+
+	/**
+	 * @return The material that should represent this trigger in any guis
+	 */
+	public abstract Material getMaterial();
 
 }
