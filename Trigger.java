@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import com.booksaw.betterGuis.gui.BetterGui;
+import com.booksaw.betterGuis.gui.editor.actions.DetailsChangeAction;
 import com.booksaw.betterGuis.internalApi.TypeList;
 import com.booksaw.betterGuis.item.BetterItem;
 import com.booksaw.betterGuis.item.trigger.CloseTrigger;
@@ -20,6 +21,8 @@ import com.booksaw.betterGuis.item.trigger.UpdateTrigger;
 import com.booksaw.betterGuis.message.MessageManager;
 import com.booksaw.guiAPI.API.builder.ItemBuilder;
 import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
+import com.booksaw.guiAPI.API.items.itemActions.ItemAction;
+import com.booksaw.guiAPI.API.items.itemActions.LongChatEvent;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -218,11 +221,32 @@ public abstract class Trigger {
 	}
 
 	public ItemStack getItem() {
-		return new ItemBuilder(getMaterial()).setName(ChatColor.GOLD + "" + ChatColor.BOLD + getReference())
-				.addLoreLine(ChatColor.AQUA + getHelp())
-				.addLoreLine(String.format(MessageManager.getMessage("triggerseditor.syntax"),
-						((getParameters() != null) ? getParameters() : "None")))
-				.getItem();
+		ItemBuilder builder = new ItemBuilder(getMaterial())
+				.setName(ChatColor.GOLD + "" + ChatColor.BOLD + getReference()).addLoreLine(ChatColor.AQUA + getHelp());
+
+		if (requiresDetails()) {
+			builder.addLoreLine(String.format(MessageManager.getMessage("detailssyntax"), getPlaintext()));
+		}
+
+		builder.addLoreLine(String.format(MessageManager.getMessage("triggerseditor.syntax"),
+				((getParameters() != null) ? getParameters() : "None")));
+
+		return builder.getItem();
+
+	}
+
+	/**
+	 * Used to get the item action to edit this type of trigger
+	 * <p>
+	 * This defaults to just a chat prompt, this is only here if a trigger wants a
+	 * different style of event
+	 * </p>
+	 * 
+	 * @parm item The item associated with this trigger
+	 * @return The item action for this trigger
+	 */
+	public ItemAction getItemAction(BetterItem item) {
+		return new LongChatEvent(new DetailsChangeAction(item, this));
 	}
 
 	@Override
@@ -279,7 +303,7 @@ public abstract class Trigger {
 	/**
 	 * Used to load a new trigger with no details (from a command)
 	 * 
-	 * @return If the trigger can accept no deatils as an option
+	 * @return If the trigger can accept no details as an option
 	 */
 	public abstract boolean loadFromString();
 
@@ -290,6 +314,14 @@ public abstract class Trigger {
 	 * @return If the details provided are valid
 	 */
 	public abstract boolean loadFromString(String args);
+
+	/**
+	 * Used to determine if the trigger requires details
+	 * 
+	 * @return True - the trigger requires details. False - The trigger does not
+	 *         require details
+	 */
+	public abstract boolean requiresDetails();
 
 	/**
 	 * @return The material that should represent this trigger in any guis
