@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 
 import com.booksaw.betterGuis.gui.BetterGui;
 import com.booksaw.betterGuis.internalApi.TypeList;
@@ -16,6 +17,8 @@ import com.booksaw.betterGuis.item.trigger.CloseTrigger;
 import com.booksaw.betterGuis.item.trigger.CommandTrigger;
 import com.booksaw.betterGuis.item.trigger.GuiTrigger;
 import com.booksaw.betterGuis.item.trigger.UpdateTrigger;
+import com.booksaw.betterGuis.message.MessageManager;
+import com.booksaw.guiAPI.API.builder.ItemBuilder;
 import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
 
 import net.md_5.bungee.api.ChatColor;
@@ -212,6 +215,14 @@ public abstract class Trigger {
 		}
 
 		loadDetails(config);
+	}
+
+	public ItemStack getItem() {
+		return new ItemBuilder(getMaterial()).setName(ChatColor.GOLD + "" + ChatColor.BOLD + getReference())
+				.addLoreLine(ChatColor.AQUA + getHelp())
+				.addLoreLine(String.format(MessageManager.getMessage("triggerseditor.syntax"),
+						((getParameters() != null) ? getParameters() : "None")))
+				.getItem();
 	}
 
 	@Override
