@@ -61,6 +61,21 @@ public abstract class Trigger {
 	private final static TypeList<Trigger> triggers = new TypeList<>();
 
 	/**
+	 * Used to check if the click type provided is a considered valid by the plugin
+	 * 
+	 * @param type the type to check
+	 * @return If it is a supported click type
+	 */
+	public static boolean isValid(ClickType type) {
+		if (type == null || type == ClickType.CREATIVE || type == ClickType.WINDOW_BORDER_LEFT
+				|| type == ClickType.WINDOW_BORDER_RIGHT || type == ClickType.UNKNOWN
+				|| type == ClickType.DOUBLE_CLICK) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Used to register a trigger so it can be used and loaded from
 	 * 
 	 * @param reference    The reference for the trigger
@@ -220,11 +235,24 @@ public abstract class Trigger {
 		loadDetails(config);
 	}
 
+	/**
+	 * @return the item to represent this trigger in a gui
+	 */
 	public ItemStack getItem() {
+		return getItem(true);
+	}
+
+	/**
+	 * 
+	 * @param includeDetails If speicifc trigger details should be included (if the
+	 *                       item should just be a generic trigger or not)
+	 * @return The item to represent this trigger in a gui
+	 */
+	public ItemStack getItem(boolean includeDetails) {
 		ItemBuilder builder = new ItemBuilder(getMaterial())
 				.setName(ChatColor.GOLD + "" + ChatColor.BOLD + getReference()).addLoreLine(ChatColor.AQUA + getHelp());
 
-		if (requiresDetails()) {
+		if (requiresDetails() && includeDetails) {
 			builder.addLoreLine(String.format(MessageManager.getMessage("detailssyntax"), getPlaintext()));
 		}
 
