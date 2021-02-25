@@ -250,17 +250,23 @@ public abstract class Trigger {
 	 */
 	public ItemStack getItem(boolean includeDetails) {
 		ItemBuilder builder = new ItemBuilder(getMaterial())
-				.setName(ChatColor.GOLD + "" + ChatColor.BOLD + getReference()).addLoreLine(ChatColor.AQUA + getHelp());
-
-		if (requiresDetails() && includeDetails) {
-			builder.addLoreLine(String.format(MessageManager.getMessage("detailssyntax"), getPlaintext()));
-		}
-
-		builder.addLoreLine(String.format(MessageManager.getMessage("triggerseditor.syntax"),
-				((getParameters() != null) ? getParameters() : "None")));
-
+				.setName(ChatColor.GOLD + "" + ChatColor.BOLD + getReference()).setLore(getDetails(includeDetails));
 		return builder.getItem();
 
+	}
+
+	public List<String> getDetails(boolean includeDetails) {
+		List<String> toReturn = new ArrayList<>();
+		toReturn.add(ChatColor.AQUA + getHelp());
+
+		if (requiresDetails() && includeDetails) {
+			toReturn.add(String.format(MessageManager.getMessage("detailssyntax"), getPlaintext()));
+		}
+
+		toReturn.add(String.format(MessageManager.getMessage("triggerseditor.syntax"),
+				((getParameters() != null) ? getParameters() : "None")));
+
+		return toReturn;
 	}
 
 	/**
@@ -314,7 +320,7 @@ public abstract class Trigger {
 	 * @return A plaintext description of this specific trigger, this is used in
 	 *         /bgui item details
 	 */
-	protected abstract String getPlaintext();
+	public abstract String getPlaintext();
 
 	/**
 	 * Used to get the help message for how the trigger details should be formatted
