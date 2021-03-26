@@ -17,6 +17,7 @@ import com.booksaw.betterGuis.item.BetterItem;
 import com.booksaw.betterGuis.item.trigger.CloseTrigger;
 import com.booksaw.betterGuis.item.trigger.CommandTrigger;
 import com.booksaw.betterGuis.item.trigger.GuiTrigger;
+import com.booksaw.betterGuis.item.trigger.MessageTrigger;
 import com.booksaw.betterGuis.item.trigger.UpdateTrigger;
 import com.booksaw.betterGuis.message.MessageManager;
 import com.booksaw.guiAPI.API.builder.ItemBuilder;
@@ -56,6 +57,7 @@ public abstract class Trigger {
 		registerTrigger("close", CloseTrigger.class);
 		registerTrigger("update", UpdateTrigger.class);
 		registerTrigger("gui", GuiTrigger.class);
+		registerTrigger("message", MessageTrigger.class);
 	}
 
 	private final static TypeList<Trigger> triggers = new TypeList<>();
