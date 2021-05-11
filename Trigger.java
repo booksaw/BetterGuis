@@ -2,23 +2,16 @@ package com.booksaw.betterGuis.api;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
+import com.booksaw.betterGuis.BetterGuis;
 import com.booksaw.betterGuis.gui.BetterGui;
 import com.booksaw.betterGuis.gui.editor.actions.DetailsChangeAction;
-import com.booksaw.betterGuis.internalApi.TypeList;
 import com.booksaw.betterGuis.item.BetterItem;
-import com.booksaw.betterGuis.item.trigger.CloseTrigger;
-import com.booksaw.betterGuis.item.trigger.CommandTrigger;
-import com.booksaw.betterGuis.item.trigger.GuiTrigger;
-import com.booksaw.betterGuis.item.trigger.MessageTrigger;
-import com.booksaw.betterGuis.item.trigger.UpdateTrigger;
 import com.booksaw.betterGuis.message.MessageManager;
 import com.booksaw.guiAPI.API.builder.ItemBuilder;
 import com.booksaw.guiAPI.API.items.itemActions.GuiEvent;
@@ -50,19 +43,6 @@ import net.md_5.bungee.api.ChatColor;
 public abstract class Trigger {
 
 	/**
-	 * Adding all internal triggers
-	 */
-	public static void enable() {
-		registerTrigger("cmd", CommandTrigger.class);
-		registerTrigger("close", CloseTrigger.class);
-		registerTrigger("update", UpdateTrigger.class);
-		registerTrigger("gui", GuiTrigger.class);
-		registerTrigger("message", MessageTrigger.class);
-	}
-
-	private final static TypeList<Trigger> triggers = new TypeList<>();
-
-	/**
 	 * Used to check if the click type provided is a considered valid by the plugin
 	 * 
 	 * @param type the type to check
@@ -75,83 +55,6 @@ public abstract class Trigger {
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * Used to register a trigger so it can be used and loaded from
-	 * 
-	 * @param reference    The reference for the trigger
-	 * @param triggerClass The class which the trigger details are stored in
-	 */
-	public final static void registerTrigger(String reference, Class<? extends Trigger> triggerClass) {
-		triggers.add(reference, triggerClass);
-	}
-
-	/**
-	 * Used to remove a trigger from the list of available triggers
-	 * 
-	 * @param reference The reference for the trigger to be removed
-	 */
-	public final static void unregisterTrigger(String reference) {
-		triggers.remove(reference);
-	}
-
-	/**
-	 * Used to get an instance of a trigger subclass, any errors caused by returning
-	 * null should be handled by wherever runs this method
-	 * 
-	 * @param reference The reference for the trigger to create
-	 * @return The created trigger or null if it could not be created
-	 */
-	public final static Trigger getTriggerInstance(String reference) {
-
-		if (!triggers.containsKey(reference)) {
-			return null;
-		}
-
-		Trigger t;
-
-		try {
-			t = triggers.createInstance(reference);
-		} catch (Exception e) {
-			// debug output
-			Bukkit.getLogger().warning("[BetterGuis] Something went wrong when loading the trigger " + reference
-					+ ", the error message is below");
-			e.printStackTrace();
-			return null;
-		}
-
-		return t;
-
-	}
-
-	/**
-	 * Used to get a set of all possible trigger references
-	 * 
-	 * @return The set of keys for all the triggers
-	 */
-	public static Set<String> getTriggerKeys() {
-		return triggers.getKeyList();
-	}
-
-	/**
-	 * Used to get a trigger from the saved details about it
-	 * 
-	 * @param section The configuration section to create the trigger from
-	 * @return The created trigger
-	 */
-	public static Trigger getTrigger(ConfigurationSection section) {
-		if (section == null) {
-			throw new IllegalArgumentException("Provided configuration section is null");
-		}
-
-		Trigger t = getTriggerInstance(section.getString("type"));
-
-		if (t == null) {
-			return null;
-		}
-		t.load(section);
-		return t;
 	}
 
 	/**
@@ -237,6 +140,12 @@ public abstract class Trigger {
 		loadDetails(config);
 	}
 
+	protected BetterGuis main;
+
+	public void setMain(BetterGuis main) {
+		this.main = main;
+	}
+
 	/**
 	 * @return the item to represent this trigger in a gui
 	 */
@@ -251,8 +160,9 @@ public abstract class Trigger {
 	 * @return The item to represent this trigger in a gui
 	 */
 	public ItemStack getItem(boolean includeDetails) {
-		ItemBuilder builder = new ItemBuilder(getMaterial())
-				.setName(ChatColor.GOLD + "" + ChatColor.BOLD + getReference()).setLore(getDetails(includeDetails));
+		ItemBuilder builder = new ItemBuilder(getMaterial()).setName(ChatColor.GOLD + "" + ChatColor.BOLD
+				+ getReference().substring(0, 1).toUpperCase() + getReference().substring(1))
+				.setLore(getDetails(includeDetails));
 		return builder.getItem();
 
 	}
